@@ -1,4 +1,4 @@
 
 
-Create Table Test_AR
+Create Table Test_AR3
 (a int)
