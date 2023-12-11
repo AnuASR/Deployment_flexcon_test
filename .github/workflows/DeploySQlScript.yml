@@ -30,10 +30,9 @@ jobs:
       - name: Deploy SQL script to Azure SQL
         uses: Azure/sql-action@v2
         with:
-          server-name: 'aztransreserver.database.windows.net'
-          database-name: 'aztransreconfigdb'
-          authentication-type: 'sqlServer'
-          sql-file: 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
+        connection-string: "Server='aztransreserver.database.windows.net';Database='aztransreconfigdb';User Id='CloudSAfe1840a6';Password='inScott@1122';Encrypt=true;Connection Timeout=30;"
+
+        path: 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
           
       - name: Print Azure Secrets
         run: |
