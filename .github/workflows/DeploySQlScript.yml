@@ -27,8 +27,10 @@ jobs:
         run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
         #run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
 
-      - name: Show Azure Account
-        run: az account show
+      - name: Deploy SQL Script
+        run: |
+          # Your SQL script deployment command goes here
+          az sql db execute-tpu -g 'rg_transre_internal' -s 'aztransreserver.database.windows.net' -n 'aztransreconfigdb' -f 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
 
       - name: Print Azure Secrets
         run: |
