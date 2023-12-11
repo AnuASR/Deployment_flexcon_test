@@ -28,3 +28,9 @@ jobs:
 
       - name: Show Azure Account
         run: az account show
+
+      - name: Print Azure Secrets
+        run: |
+          echo $AZURE_TENANT_ID
+          echo $AZURE_CLIENT_ID
+          echo $AZURE_CLIENT_SECRET
