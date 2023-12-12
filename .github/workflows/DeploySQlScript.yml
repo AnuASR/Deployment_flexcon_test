@@ -39,7 +39,7 @@ jobs:
           subscriptionId: '710bd630-857a-4b7f-aa38-8eca4ad11127'
           resourceGroupName: 'rgpocrefreshes'
           template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
-          parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
+          # parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
           # overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
       - name: Debug Log
         run: |
