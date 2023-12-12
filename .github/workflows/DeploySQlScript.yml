@@ -40,7 +40,7 @@ jobs:
           resourceGroupName: 'rgpocrefreshes'
           template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
           parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
-          overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
+          # overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
   
           
       - name: Print Azure Secrets
