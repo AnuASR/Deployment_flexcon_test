@@ -27,11 +27,20 @@ jobs:
         run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
         #run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
 
-      - name: Deploy SQL script to Azure SQL
-        uses: Azure/sql-action@v2
+      # - name: Deploy SQL script to Azure SQL
+      #   uses: Azure/sql-action@v2
+      #   with:
+      #     connection-string: 'Server=tcp:aztransreserver.database.windows.net,1433;Initial Catalog=aztransreconfigdb;Persist Security Info=False;User ID=CloudSAfe1840a6;Password=inScott@1122;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+      #     path: 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
+
+      - name: Deploy ARM Template
+        uses: Azure/arm-deploy@v1
         with:
-          connection-string: 'Server=tcp:aztransreserver.database.windows.net,1433;Initial Catalog=aztransreconfigdb;Persist Security Info=False;User ID=CloudSAfe1840a6;Password=inScott@1122;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-          path: 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
+          subscriptionId: '710bd630-857a-4b7f-aa38-8eca4ad11127'
+          resourceGroupName: 'rgpocrefreshes'
+          template: 'ADF/ARM Templates/ARMTemplateForFactory.json'
+          parametersFile: 'ADF/ARM Templates/ARMTemplateParametersForFactory.json'
+  
           
       - name: Print Azure Secrets
         run: |
