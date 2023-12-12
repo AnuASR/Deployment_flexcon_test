@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "adfpocarr"
+        },
+        "AzureDataLakeStorage1_accountKey": {
+            "value": ""
+        },
+        "LS_AzureSQL_EU_connectionString": {
+            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
+        },
+        "LS_AZ_SQLDatabase_connectionString": {
+            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-dataprd.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20"
+        },
+        "AzureDataLakeStorage1_properties_typeProperties_url": {
+            "value": "https://adlsbicepmodule.dfs.core.windows.net/"
+        },
+        "LS_AZ_KeyVault_properties_typeProperties_baseUrl": {
+            "value": "https://flex-securevault-datadev.vault.azure.net/"
+        }
+    }
+}
