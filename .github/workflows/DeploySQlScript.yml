@@ -41,8 +41,14 @@ jobs:
           template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
           parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
           # overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
-  
-          
+      - name: Debug Log
+        run: |
+          echo "ARM Template Contents:"
+          cat 'ADF/ARMTemplate/ARMTemplateForFactory.json'
+      
+          echo "Parameters File Contents:"
+          cat 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
+      
       - name: Print Azure Secrets
         run: |
           echo $AZURE_TENANT_ID
