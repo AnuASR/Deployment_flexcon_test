@@ -40,6 +40,7 @@ jobs:
           resourceGroupName: 'rgpocrefreshes'
           template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
           parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
+          overrideParameters: '-LS_AZ_SQLDatabase_connectionString Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-dataprd.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20'
   
           
       - name: Print Azure Secrets
