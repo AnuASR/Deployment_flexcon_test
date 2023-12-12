@@ -38,8 +38,8 @@ jobs:
         with:
           subscriptionId: '710bd630-857a-4b7f-aa38-8eca4ad11127'
           resourceGroupName: 'rgpocrefreshes'
-          template: 'ADF/ARM Templates/ARMTemplateForFactory.json'
-          parametersFile: 'ADF/ARM Templates/ARMTemplateParametersForFactory.json'
+          template: 'ADF/ARMTemplates/ARMTemplateForFactory.json'
+          parametersFile: 'ADF/ARMTemplates/ARMTemplateParametersForFactory.json'
   
           
       - name: Print Azure Secrets
