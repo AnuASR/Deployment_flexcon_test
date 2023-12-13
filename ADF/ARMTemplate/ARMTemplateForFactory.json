@@ -4,7 +4,7 @@
     "parameters": {
         "factoryName": {
             "type": "string",
-            "defaultValue": "internalrajeshadf"
+            "defaultValue": "abc"
         },
       "AzureDataLakeStorage1_accountKey": {
         "type": "secureString",
