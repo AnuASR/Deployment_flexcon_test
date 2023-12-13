@@ -33,13 +33,13 @@ jobs:
       #     connection-string: 'Server=tcp:aztransreserver.database.windows.net,1433;Initial Catalog=aztransreconfigdb;Persist Security Info=False;User ID=CloudSAfe1840a6;Password=inScott@1122;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
       #     path: 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
 
-      # - name: Deploy ARM Template
-      #   uses: Azure/arm-deploy@v1
-      #   with:
-      #     subscriptionId: '710bd630-857a-4b7f-aa38-8eca4ad11127'
-      #     resourceGroupName: 'rgpocrefreshes'
-      #     template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
-          # parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
+      - name: Deploy ARM Template
+        uses: Azure/arm-deploy@v1
+        with:
+          subscriptionId: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
+          resourceGroupName: 'Rajesh_snpDemo1'
+          template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
+          parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
           # overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
       - name: Debug Log
         run: |
