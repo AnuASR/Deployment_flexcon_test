@@ -1,22 +1,64 @@
-# File: .github/workflows/workflow.yml
+# This is a basic workflow to help you get started with Actions
 
-on: [push]
+name: CI
 
-name: Run Azure Login With a Service Principal Secret
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-
-  build-and-deploy:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - shell: bash
+      env:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+        
+    - name: Azure Login
+      run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
     
-    - uses: azure/login@v1
+    - name: Azure Login_secrets  
+      run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Install Azure CLI
+      run: |
+        sudo apt-get update && sudo apt-get install -y azure-cli
+    
+    # - name: Install Azure PowerShell Module
+    #   run: |
+    #     Install-Module -Name Az -AllowClobber -Force -Scope CurrentUser
+
+
+    - name: Azure Login_cred
+      uses: azure/login@v1
       with:
+        az-version: latest
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Azure CLI scripts
-      uses: azure/CLI@v1
-      with:
-        azcliversion: latest
-        inlineScript: |
-          az account show
+       
+        
+    - name: Display Azure Subscription Informations
+      run: az account show
+      # - name: Azure Login
+        # run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
+        # -run: echo ${{ secrets.AZURE_CLIENT_ID }}
+          # run: echo $V_AZURE_CLIENT_ID
+        
+        # run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
+        # run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
