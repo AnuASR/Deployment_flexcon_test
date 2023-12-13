@@ -8,17 +8,11 @@
         "LS_AZ_SQLDB_SRC_connectionString": {
             "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().servername};Initial Catalog=@{linkedService().databasename};User ID=@{linkedService().username};Password=@{linkedService().password}"
         },
-        "AzureSqlMI1_connectionString": {
-            "value": ""
-        },
         "LS_AZ_SQLDatabase_connectionString": {
             "value": "Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-datadev.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20"
         },
         "LS_AzureSQL_EU_connectionString": {
             "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
-        },
-        "AzureDataLakeStorage1_accountKey": {
-            "value": ""
         },
         "trigger1_properties_PL_Staging_RDBMS_Master_parameters_FilterClause": {
             "value": "isactive=1"
