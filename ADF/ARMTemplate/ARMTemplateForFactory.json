@@ -4,7 +4,7 @@
     "parameters": {
         "factoryName": {
             "type": "string",
-            "defaultValue": "flex-datafactory-datadev"
+            "defaultValue": "internalrajeshadf"
         },
         "LS_AZ_SQLDatabase_connectionString": {
             "type": "secureString",
