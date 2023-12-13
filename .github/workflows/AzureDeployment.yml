@@ -21,25 +21,27 @@ jobs:
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Azure Login_cred
-      uses: azure/login@v1
-      with:
-        az-version: latest
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Azure Login_cred
+        uses: azure/login@v1
+        with:
+          az-version: latest
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-    - name: print pwd
-      run: |
-          echo `pwd`
+      - name: print pwd
+        run: |
+            echo `pwd`
     
    
           
-    - name: Deploy SQL script to Azure SQL
-      uses: Azure/sql-action@v2
-      with:
-        connection-string: 'Server=tcp:rajeshsnpdemo1.database.windows.net,1433;Initial Catalog=RajeshDemo1;Persist Security Info=False;User ID=rajeshsnpdemo1;Password=inScott@1122;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-        path: 'TestScript.sql'
+      - name: Deploy SQL script to Azure SQL
+        uses: Azure/sql-action@v2
+        with:
+          connection-string: 'Server=tcp:rajeshsnpdemo1.database.windows.net,1433;Initial Catalog=RajeshDemo1;Persist Security Info=False;User ID=rajeshsnpdemo1;Password=inScott@1122;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          path: 'TestScript.sql'
 
         
-    - name: Display Azure Subscription Informations
-      run: az account show
+      - name: Display Azure Subscription Informations
+        run: az account show
      
