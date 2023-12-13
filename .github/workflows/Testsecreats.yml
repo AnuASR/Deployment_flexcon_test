@@ -27,10 +27,7 @@ jobs:
 
       - name: Azure Login
         run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
-        env:
-          V_AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          run: |
-            echo $V_AZURE_CLIENT_ID
+          echo ${{ secrets.AZURE_CLIENT_ID }}
           # run: echo $V_AZURE_CLIENT_ID
         
         # run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
