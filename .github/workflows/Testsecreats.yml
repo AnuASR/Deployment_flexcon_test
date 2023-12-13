@@ -22,12 +22,16 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      # - uses: actions/checkout@v3
+    - name: Hello world action
+      with: # Set the secret as an input
+        super_secret: ${{ secrets.AZURE_CLIENT_ID }}
+      env: # Or as an environment variable
+        super_secret: ${{ secrets.AZURE_CLIENT_ID }}
+        run: echo $super_secret
 
-      - name: Azure Login
-        run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
-          echo ${{ secrets.AZURE_CLIENT_ID }}
+      # - name: Azure Login
+        # run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
+        # -run: echo ${{ secrets.AZURE_CLIENT_ID }}
           # run: echo $V_AZURE_CLIENT_ID
         
         # run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
