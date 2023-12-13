@@ -5,9 +5,6 @@
         "factoryName": {
             "value": "internalrajeshadf"
         },
-        "AzureDataLakeStorage1_accountKey": {
-            "value": "abc"
-        },
         "LS_AZ_SQLDatabase_connectionString": {
             "value": "Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-datadev.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20"
         },
