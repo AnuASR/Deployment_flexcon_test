@@ -1,0 +1,2462 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+           "defaultValue": "internalrajeshadf"
+        },
+        "LS_AZ_SQLDB_SRC_connectionString": {
+            "type": "secureString",
+            "defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().servername};Initial Catalog=@{linkedService().databasename};User ID=@{linkedService().username};Password=@{linkedService().password}"
+        },
+        "AzureSqlMI1_connectionString": {
+            "type": "secureString"
+        },
+        "LS_AZ_SQLDatabase_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'LS_AZ_SQLDatabase'",
+            "defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-datadev.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20"
+        },
+        "LS_AzureSQL_EU_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'LS_AzureSQL_EU'",
+            "defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
+        },
+        "AzureDataLakeStorage1_accountKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+        },
+        "trigger1_properties_PL_Staging_RDBMS_Master_parameters_FilterClause": {
+            "type": "string",
+            "defaultValue": "isactive=1"
+        },
+        "trigger1_properties_PL_Staging_RDBMS_Master_parameters_run_type": {
+            "type": "string",
+            "defaultValue": "trigger"
+        },
+        "trigger1_properties_PL_Staging_RDBMS_Master_parameters_BusinessArea": {
+            "type": "string",
+            "defaultValue": "test_trigger"
+        },
+        "trigger2_properties_PL_Staging_RDBMS_Master_parameters_FilterClause": {
+            "type": "string",
+            "defaultValue": "isactive=1"
+        },
+        "trigger2_properties_PL_Staging_RDBMS_Master_parameters_run_type": {
+            "type": "string",
+            "defaultValue": "trigger"
+        },
+        "trigger2_properties_PL_Staging_RDBMS_Master_parameters_BusinessArea": {
+            "type": "string",
+            "defaultValue": "testdd"
+        },
+        "LS_AZ_ADLS_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "@{concat('https://',linkedService().AccountName,'.dfs.core.windows.net')}"
+        },
+        "LS_AZ_KeyVault_properties_typeProperties_baseUrl": {
+            "type": "string",
+            "defaultValue": "https://flex-securevault-datadev.vault.azure.net/"
+        },
+        "AzureDataLakeStorage1_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://adlsbicepmodule.dfs.core.windows.net/"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/trigger1')]",
+            "type": "Microsoft.DataFactory/factories/triggers",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "runtimeState": "Stopped",
+                "pipelines": [
+                    {
+                        "pipelineReference": {
+                            "referenceName": "PL_Staging_RDBMS_Master",
+                            "type": "PipelineReference"
+                        },
+                        "parameters": {
+                            "FilterClause": "[parameters('trigger1_properties_PL_Staging_RDBMS_Master_parameters_FilterClause')]",
+                            "run_type": "[parameters('trigger1_properties_PL_Staging_RDBMS_Master_parameters_run_type')]",
+                            "BusinessArea": "[parameters('trigger1_properties_PL_Staging_RDBMS_Master_parameters_BusinessArea')]"
+                        }
+                    }
+                ],
+                "type": "ScheduleTrigger",
+                "typeProperties": {
+                    "recurrence": {
+                        "frequency": "Minute",
+                        "interval": 1,
+                        "startTime": "2023-11-14T07:21:00",
+                        "timeZone": "Dateline Standard Time"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/PL_Staging_RDBMS_Master')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/trigger2')]",
+            "type": "Microsoft.DataFactory/factories/triggers",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "runtimeState": "Stopped",
+                "pipelines": [
+                    {
+                        "pipelineReference": {
+                            "referenceName": "PL_Staging_RDBMS_Master",
+                            "type": "PipelineReference"
+                        },
+                        "parameters": {
+                            "FilterClause": "[parameters('trigger2_properties_PL_Staging_RDBMS_Master_parameters_FilterClause')]",
+                            "run_type": "[parameters('trigger2_properties_PL_Staging_RDBMS_Master_parameters_run_type')]",
+                            "BusinessArea": "[parameters('trigger2_properties_PL_Staging_RDBMS_Master_parameters_BusinessArea')]"
+                        }
+                    }
+                ],
+                "type": "ScheduleTrigger",
+                "typeProperties": {
+                    "recurrence": {
+                        "frequency": "Day",
+                        "interval": 1,
+                        "startTime": "2023-11-20T11:16:00",
+                        "timeZone": "Dateline Standard Time"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/PL_Staging_RDBMS_Master')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_AzSQL')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_AZ_SQLDB_SRC",
+                    "type": "LinkedServiceReference",
+                    "parameters": {
+                        "servername": {
+                            "value": "@dataset().servername",
+                            "type": "Expression"
+                        },
+                        "databasename": {
+                            "value": "@dataset().databasename",
+                            "type": "Expression"
+                        },
+                        "username": {
+                            "value": "@dataset().username",
+                            "type": "Expression"
+                        },
+                        "password": {
+                            "value": "@dataset().password",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "parameters": {
+                    "servername": {
+                        "type": "string"
+                    },
+                    "databasename": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": "sys",
+                    "table": "tables"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDB_SRC')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_AZ_SQLDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {}
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DES_ADLS_Json')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_AZ_ADLS",
+                    "type": "LinkedServiceReference",
+                    "parameters": {
+                        "AccountName": {
+                            "value": "@dataset().AccountName",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "parameters": {
+                    "ContainerName": {
+                        "type": "string"
+                    },
+                    "FolderPath": {
+                        "type": "string"
+                    },
+                    "FileName": {
+                        "type": "string"
+                    },
+                    "AccountName": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": {
+                            "value": "@dataset().FileName",
+                            "type": "Expression"
+                        },
+                        "folderPath": {
+                            "value": "@dataset().FolderPath",
+                            "type": "Expression"
+                        },
+                        "fileSystem": {
+                            "value": "@dataset().ContainerName",
+                            "type": "Expression"
+                        }
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_ADLS')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_BinaryFolder')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_AZ_ADLS",
+                    "type": "LinkedServiceReference",
+                    "parameters": {
+                        "AccountName": {
+                            "value": "@dataset().AccountName",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "parameters": {
+                    "AccountName": {
+                        "type": "string"
+                    },
+                    "ContainerName": {
+                        "type": "string"
+                    },
+                    "FolderPath": {
+                        "type": "string"
+                    },
+                    "FileName": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "Binary",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "folderPath": {
+                            "value": "@dataset().FolderPath",
+                            "type": "Expression"
+                        },
+                        "fileSystem": {
+                            "value": "@dataset().ContainerName",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_ADLS')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_AZSQL_EU')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_AzureSQL_EU",
+                    "type": "LinkedServiceReference",
+                    "parameters": {
+                        "ServerName": {
+                            "value": "@dataset().ServerName",
+                            "type": "Expression"
+                        },
+                        "DatabaseName": {
+                            "value": "@dataset().DatabaseName",
+                            "type": "Expression"
+                        },
+                        "UserName": {
+                            "value": "@dataset().UserName",
+                            "type": "Expression"
+                        },
+                        "AKVSecretName": {
+                            "value": "@dataset().AKVSecretName",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "parameters": {
+                    "TableName": {
+                        "type": "string"
+                    },
+                    "SchemaName": {
+                        "type": "string"
+                    },
+                    "ServerName": {
+                        "type": "string"
+                    },
+                    "DatabaseName": {
+                        "type": "string"
+                    },
+                    "UserName": {
+                        "type": "string"
+                    },
+                    "AKVSecretName": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": {
+                        "value": "@dataset().SchemaName",
+                        "type": "Expression"
+                    },
+                    "table": {
+                        "value": "@dataset().TableName",
+                        "type": "Expression"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AzureSQL_EU')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_Logging_AzSQL')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_AZ_SQLDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": "common",
+                    "table": "BatchDetails"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_AZ_SQLDB_SRC')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "parameters": {
+                    "servername": {
+                        "type": "string"
+                    },
+                    "databasename": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('LS_AZ_SQLDB_SRC_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlMI1')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlMI",
+                "typeProperties": {
+                    "connectionString": "[parameters('AzureSqlMI1_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_AZ_SQLDatabase')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('LS_AZ_SQLDatabase_connectionString')]",
+                    "password": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "LS_AZ_KeyVault",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "AzSQLPassword"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_KeyVault')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_AZ_ADLS')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "parameters": {
+                    "AccountName": {
+                        "type": "string",
+                        "defaultValue": "adlsinternal"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureBlobFS",
+                "typeProperties": {
+                    "url": "[parameters('LS_AZ_ADLS_properties_typeProperties_url')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_AzureSQL_EU')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "parameters": {
+                    "ServerName": {
+                        "type": "string"
+                    },
+                    "DatabaseName": {
+                        "type": "string"
+                    },
+                    "UserName": {
+                        "type": "string"
+                    },
+                    "AKVSecretName": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('LS_AzureSQL_EU_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_AZ_KeyVault')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureKeyVault",
+                "typeProperties": {
+                    "baseUrl": "[parameters('LS_AZ_KeyVault_properties_typeProperties_baseUrl')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobFS",
+                "typeProperties": {
+                    "url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+                    "accountKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_Logging')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "If Debug",
+                        "type": "IfCondition",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "expression": {
+                                "value": "@equals(toLower(pipeline().parameters.P_RunType),'debug')",
+                                "type": "Expression"
+                            },
+                            "ifFalseActivities": [
+                                {
+                                    "name": "trigger_activityruns",
+                                    "type": "WebActivity",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "7.00:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "url": {
+                                            "value": "@{concat('https://management.azure.com/subscriptions/',pipeline().globalParameters.SubscriptionID,'/resourceGroups/',pipeline().globalParameters.ResourceGroupName,'/providers/Microsoft.DataFactory/factories/',pipeline().DataFactory)}/pipelineruns/@{pipeline().parameters.P_RunId}/queryActivityruns?api-version=2018-06-01",
+                                            "type": "Expression"
+                                        },
+                                        "method": "POST",
+                                        "headers": {},
+                                        "body": {
+                                            "value": "{\n  \"lastUpdatedAfter\": \"@{formatDateTime(pipeline().parameters.P_StartTime)}\",\n  \"lastUpdatedBefore\": \"@{formatDateTime(pipeline().parameters.P_EndTime)}\"\n}",
+                                            "type": "Expression"
+                                        },
+                                        "authentication": {
+                                            "type": "MSI",
+                                            "resource": "https://management.azure.com"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "sp_pipeline logger_Trigger",
+                                    "type": "SqlServerStoredProcedure",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "trigger_activityruns",
+                                            "dependencyConditions": [
+                                                "Succeeded"
+                                            ]
+                                        }
+                                    ],
+                                    "policy": {
+                                        "timeout": "7.00:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "storedProcedureName": "[[common].[usp_EU_ADFPipelineLogger]",
+                                        "storedProcedureParameters": {
+                                            "batch_id": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.P_BatchId",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "Int64"
+                                            },
+                                            "custom_identifier": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.P_CustomIdentifier",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "String"
+                                            },
+                                            "json_value": {
+                                                "value": {
+                                                    "value": "@{string(activity('trigger_activityruns').output)}",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "String"
+                                            }
+                                        }
+                                    },
+                                    "linkedServiceName": {
+                                        "referenceName": "LS_AZ_SQLDatabase",
+                                        "type": "LinkedServiceReference"
+                                    }
+                                }
+                            ],
+                            "ifTrueActivities": [
+                                {
+                                    "name": "debug_sandboxactivityruns",
+                                    "type": "WebActivity",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "7.00:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "url": {
+                                            "value": "@{concat('https://management.azure.com/subscriptions/',pipeline().globalParameters.SubscriptionID,'/resourceGroups/',pipeline().globalParameters.ResourceGroupName,'/providers/Microsoft.DataFactory/factories/',pipeline().DataFactory)}/sandboxpipelineruns/@{pipeline().parameters.P_RunId}/sandboxActivityRuns?startTime=@{formatDateTime(pipeline().parameters.P_StartTime)}&endTime=@{formatDateTime(pipeline().parameters.P_EndTime)}&api-version=2017-09-01-preview",
+                                            "type": "Expression"
+                                        },
+                                        "method": "GET",
+                                        "headers": {},
+                                        "httpRequestTimeout": "",
+                                        "authentication": {
+                                            "type": "MSI",
+                                            "resource": "https://management.azure.com"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "sp_pipeline logger",
+                                    "type": "SqlServerStoredProcedure",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "debug_sandboxactivityruns",
+                                            "dependencyConditions": [
+                                                "Succeeded"
+                                            ]
+                                        }
+                                    ],
+                                    "policy": {
+                                        "timeout": "7.00:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "storedProcedureName": "[[common].[usp_EU_ADFPipelineLogger]",
+                                        "storedProcedureParameters": {
+                                            "batch_id": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.P_BatchId",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "Int64"
+                                            },
+                                            "custom_identifier": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.P_CustomIdentifier",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "String"
+                                            },
+                                            "json_value": {
+                                                "value": {
+                                                    "value": "@{string(activity('debug_sandboxactivityruns').output)}",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "String"
+                                            }
+                                        }
+                                    },
+                                    "linkedServiceName": {
+                                        "referenceName": "LS_AZ_SQLDatabase",
+                                        "type": "LinkedServiceReference"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "P_RunId": {
+                        "type": "string"
+                    },
+                    "P_StartTime": {
+                        "type": "string",
+                        "defaultValue": "2018-01-01"
+                    },
+                    "P_EndTime": {
+                        "type": "string",
+                        "defaultValue": "2025-01-01"
+                    },
+                    "P_RunType": {
+                        "type": "string",
+                        "defaultValue": "trigger"
+                    },
+                    "P_CustomIdentifier": {
+                        "type": "string",
+                        "defaultValue": "Unknown"
+                    },
+                    "P_BatchId": {
+                        "type": "string"
+                    },
+                    "P_Adf_Api_Base_Url": {
+                        "type": "string"
+                    },
+                    "P_PipelineName": {
+                        "type": "string",
+                        "defaultValue": "PL_Mart_Child"
+                    }
+                },
+                "folder": {
+                    "name": "EU/Logging"
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-12-13T10:17:22Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_PipelineLogging')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "PipelineRunMonitor",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "Web1",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": {
+                                "value": "https://management.azure.com/subscriptions/7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad/resourceGroups/Rajesh_snpDemo1/providers/Microsoft.DataFactory/factories/internalrajeshadf/queryPipelineRuns?api-version=2018-06-01&$top=100",
+                                "type": "Expression"
+                            },
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "lastUpdatedAfter": "2023-11-18T11:06:12.6660695Z",
+                                "lastUpdatedBefore": "2024-11-16T13:10:01.06575Z"
+                            },
+                            "authentication": {
+                                "type": "MSI",
+                                "resource": "https://management.azure.com"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Stored procedure1",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "PipelineRunMonitor",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[common].[usp_ADFPipelineRunLogger]",
+                            "storedProcedureParameters": {
+                                "json_value": {
+                                    "value": {
+                                        "value": "@{string(activity('PipelineRunMonitor').output)}\n\n",
+                                        "type": "Expression"
+                                    },
+                                    "type": "String"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "Web1",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "Web1_copy1",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": {
+                                "value": "https://management.azure.com/subscriptions/7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad/resourceGroups/Rajesh_snpDemo1/providers/Microsoft.DataFactory/factories/internalrajeshadf/triggers?api-version=2018-06-01",
+                                "type": "Expression"
+                            },
+                            "method": "GET",
+                            "headers": {},
+                            "authentication": {
+                                "type": "MSI",
+                                "resource": "https://management.azure.com"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Web1_copy1",
+                        "type": "WebActivity",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": {
+                                "value": "https://management.azure.com/subscriptions/7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad/resourceGroups/Rajesh_snpDemo1/providers/Microsoft.DataFactory/factories/internalrajeshadf/queryTriggerRuns?api-version=2018-06-01\n",
+                                "type": "Expression"
+                            },
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
+                                "lastUpdatedBefore": "2024-06-16T00:49:48.3686473Z",
+                                "filters": [
+                                    {
+                                        "operand": "TriggerName",
+                                        "operator": "Equals",
+                                        "values": [
+                                            "trigger1"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "authentication": {
+                                "type": "MSI",
+                                "resource": "https://management.azure.com"
+                            }
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-11-20T09:11:00Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_Staging_RDBMS_Child_0')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Set Copy Type",
+                        "type": "SetVariable",
+                        "dependsOn": [],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "variableName": "CopyType",
+                            "value": {
+                                "value": "@{if(\n    and(\n        and(\n             not(equals(pipeline().parameters.Entity.IncRefreshColumn,''))\n            ,not(equals(pipeline().parameters.Entity.PrimaryKeyList,''))\n        )\n    ,equals(toLower(pipeline().parameters.Entity.LoadType),'inc')\n    )\n    ,'inc'\n    ,'ftl'\n)\n}",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Get Folder Info",
+                        "type": "GetMetadata",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataset": {
+                                "referenceName": "DS_BinaryFolder",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "AccountName": {
+                                        "value": "@json(pipeline().parameters.Entity.TgtConnectionParam).AccountName",
+                                        "type": "Expression"
+                                    },
+                                    "ContainerName": {
+                                        "value": "@pipeline().parameters.Entity.TgtRootContainer",
+                                        "type": "Expression"
+                                    },
+                                    "FolderPath": {
+                                        "value": "@{toLower(pipeline().parameters.Entity.BusinessArea)}/@{toLower(pipeline().parameters.Entity.SrcTableSchema)}/@{toLower(pipeline().parameters.Entity.TgtFileName)}",
+                                        "type": "Expression"
+                                    },
+                                    "FileName": " "
+                                }
+                            },
+                            "fieldList": [
+                                "exists"
+                            ],
+                            "storeSettings": {
+                                "type": "AzureBlobFSReadSettings",
+                                "recursive": true,
+                                "enablePartitionDiscovery": false
+                            },
+                            "formatSettings": {
+                                "type": "BinaryReadSettings"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Set Run Time",
+                        "type": "SetVariable",
+                        "dependsOn": [],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "variableName": "Runtime",
+                            "value": {
+                                "value": "@createArray(\n    pipeline().parameters.Entity.RefreshStartDate\n    ,split(pipeline().parameters.Entity.RefreshStartDate,'-')[0]\n    ,split(pipeline().parameters.Entity.RefreshStartDate,'-')[1]\n    ,take(split(pipeline().parameters.Entity.RefreshStartDate,'-')[2],2)\n    ,take(split(pipeline().parameters.Entity.RefreshStartDate,'T')[1],2)\n    ,split(pipeline().parameters.Entity.RefreshStartDate,':')[1]\n    ,take(split(pipeline().parameters.Entity.RefreshStartDate,':')[2],2)\n)",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "If ftl load",
+                        "type": "IfCondition",
+                        "dependsOn": [
+                            {
+                                "activity": "Set Copy Type",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "Get Folder Info",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "Set Run Time",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "Update LastRefreshStatus To InProgress",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "expression": {
+                                "value": "@and(\n    equals(variables('CopyType'),'ftl')\n    ,activity('Get Folder Info').output.exists\n)",
+                                "type": "Expression"
+                            },
+                            "ifTrueActivities": [
+                                {
+                                    "name": "Delete Existing files",
+                                    "type": "Delete",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "7.00:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "dataset": {
+                                            "referenceName": "DES_ADLS_Json",
+                                            "type": "DatasetReference",
+                                            "parameters": {
+                                                "ContainerName": {
+                                                    "value": "@pipeline().parameters.Entity.TgtRootContainer",
+                                                    "type": "Expression"
+                                                },
+                                                "FolderPath": {
+                                                    "value": "@{toLower(pipeline().parameters.Entity.BusinessArea)}/@{toLower(pipeline().parameters.Entity.SrcTableSchema)}/@{toLower(pipeline().parameters.Entity.TgtFileName)}",
+                                                    "type": "Expression"
+                                                },
+                                                "FileName": " ",
+                                                "AccountName": {
+                                                    "value": "@json(pipeline().parameters.Entity.TgtConnectionParam).AccountName",
+                                                    "type": "Expression"
+                                                }
+                                            }
+                                        },
+                                        "enableLogging": false,
+                                        "storeSettings": {
+                                            "type": "AzureBlobFSReadSettings",
+                                            "recursive": true,
+                                            "enablePartitionDiscovery": false
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Get Max Date In Source",
+                        "type": "Script",
+                        "dependsOn": [
+                            {
+                                "activity": "If ftl load",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDB_SRC",
+                            "type": "LinkedServiceReference",
+                            "parameters": {
+                                "servername": {
+                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).ServerName",
+                                    "type": "Expression"
+                                },
+                                "databasename": {
+                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).DatabaseName",
+                                    "type": "Expression"
+                                },
+                                "username": {
+                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).UserName",
+                                    "type": "Expression"
+                                },
+                                "password": {
+                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).Password",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "Query",
+                                    "text": {
+                                        "value": "@{\n    if(  not(equals(pipeline().parameters.Entity.IncRefreshColumn,''))\n        ,concat('SELECT MAX(',pipeline().parameters.Entity.IncRefreshColumn,') AS MaxDate FROM [',pipeline().parameters.Entity.SrcTableSchema,'].[',pipeline().parameters.Entity.SrcTableName,']')\n        ,'SELECT NULL AS MaxDate'\n    )\n}\n",
+                                        "type": "Expression"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "COPY_OnPrem_To_ADLS",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Get Max Date In Source",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 3,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "@{if(      equals(variables('CopyType'),'ftl')      ,if(           equals(pipeline().parameters.Entity.Query,'')           ,replace(pipeline().parameters.Entity.CreatedQuery,'_lmdcclause_',' 1=1 ')           ,replace(pipeline().parameters.Entity.Query,'_lmdcclause_',' 1=1 ')      )      ,if(           equals(pipeline().parameters.Entity.Query,'')           ,replace(pipeline().parameters.Entity.CreatedQuery,'_lmdcclause_',concat(pipeline().parameters.Entity.IncRefreshColumn,' >= ''',pipeline().parameters.Entity.IncRefreshMaxDate,'''',' AND ',pipeline().parameters.Entity.IncRefreshColumn,' <= ','''',activity('Get Max Date In Source').output.resultSets[0].rows[0].MaxDate,''''))           ,replace(pipeline().parameters.Entity.Query,'_lmdcclause_',concat(pipeline().parameters.Entity.IncRefreshColumn,' >= ''',pipeline().parameters.Entity.IncRefreshMaxDate,'''',' AND ',pipeline().parameters.Entity.IncRefreshColumn,' <= ','''',activity('Get Max Date In Source').output.resultSets[0].rows[0].MaxDate,''''))      ) ) }",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00",
+                                "partitionOption": "None"
+                            },
+                            "sink": {
+                                "type": "ParquetSink",
+                                "storeSettings": {
+                                    "type": "AzureBlobFSWriteSettings"
+                                },
+                                "formatSettings": {
+                                    "type": "ParquetWriteSettings"
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "DS_AzSQL",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "servername": {
+                                        "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).ServerName",
+                                        "type": "Expression"
+                                    },
+                                    "databasename": {
+                                        "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).DatabaseName",
+                                        "type": "Expression"
+                                    },
+                                    "username": {
+                                        "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).UserName",
+                                        "type": "Expression"
+                                    },
+                                    "password": {
+                                        "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).Password",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "DES_ADLS_Json",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "ContainerName": {
+                                        "value": "@pipeline().parameters.Entity.TgtRootContainer",
+                                        "type": "Expression"
+                                    },
+                                    "FolderPath": {
+                                        "value": "@concat(\n     toLower(pipeline().parameters.Entity.BusinessArea),'/'\n    ,toLower(pipeline().parameters.Entity.TgtFileName),'/'\n    ,variables('Runtime')[1],'/'\n    ,variables('Runtime')[2],'/'\n    ,variables('Runtime')[3],'/'\n    ,variables('Runtime')[4],'/'\n    ,variables('Runtime')[5],'/'\n    ,variables('Runtime')[6]\n)",
+                                        "type": "Expression"
+                                    },
+                                    "FileName": {
+                                        "value": "@{pipeline().parameters.Entity.TgtFileName}.parquet",
+                                        "type": "Expression"
+                                    },
+                                    "AccountName": {
+                                        "value": "@json(pipeline().parameters.Entity.TgtConnectionParam).AccountName",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Set FilePath",
+                        "type": "SetVariable",
+                        "dependsOn": [
+                            {
+                                "activity": "COPY_OnPrem_To_ADLS",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "PrimaryKeys Fetch",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "variableName": "FilePath",
+                            "value": {
+                                "value": "@concat(\n    variables('Runtime')[1],'/'\n    ,variables('Runtime')[2],'/'\n    ,variables('Runtime')[3],'/'\n    ,variables('Runtime')[4],'/'\n    ,variables('Runtime')[5],'/'\n    ,variables('Runtime')[6]\n)",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Update ControlTable details",
+                        "type": "Script",
+                        "dependsOn": [
+                            {
+                                "activity": "Set FilePath",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "NonQuery",
+                                    "text": {
+                                        "value": "UPDATE [config].[RDBMSControlTable]\nSET LastRefreshDate= GETDATE()\n,LastRefreshStatus='Succeeded'\n,latest_file_path=@{concat('''',variables('FilePath'),'''')}\n,IncRefreshMaxDate = '@{activity('Get Max Date In Source').output.resultSets[0].rows[0].MaxDate}'\nWHERE ControlID = @{pipeline().parameters.Entity.ControlID}\n",
+                                        "type": "Expression"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "PrimaryKeys Fetch",
+                        "type": "IfCondition",
+                        "dependsOn": [
+                            {
+                                "activity": "Get Max Date In Source",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "expression": {
+                                "value": "@equals(pipeline().parameters.Entity.PrimaryKeyList,'')",
+                                "type": "Expression"
+                            },
+                            "ifFalseActivities": [
+                                {
+                                    "name": "Copy PK_Onprem_To_ADLS",
+                                    "type": "Copy",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "7.00:00:00",
+                                        "retry": 3,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "source": {
+                                            "type": "AzureSqlSource",
+                                            "sqlReaderQuery": {
+                                                "value": "Select DISTINCT @{pipeline().parameters.Entity.PrimaryKeyList} FROM @{pipeline().parameters.Entity.SrcTableSchema}.@{pipeline().parameters.Entity.SrcTableName}",
+                                                "type": "Expression"
+                                            },
+                                            "queryTimeout": "02:00:00",
+                                            "partitionOption": "None"
+                                        },
+                                        "sink": {
+                                            "type": "ParquetSink",
+                                            "storeSettings": {
+                                                "type": "AzureBlobFSWriteSettings"
+                                            },
+                                            "formatSettings": {
+                                                "type": "ParquetWriteSettings"
+                                            }
+                                        },
+                                        "enableStaging": false,
+                                        "translator": {
+                                            "type": "TabularTranslator",
+                                            "typeConversion": true,
+                                            "typeConversionSettings": {
+                                                "allowDataTruncation": true,
+                                                "treatBooleanAsNumber": false
+                                            }
+                                        }
+                                    },
+                                    "inputs": [
+                                        {
+                                            "referenceName": "DS_AzSQL",
+                                            "type": "DatasetReference",
+                                            "parameters": {
+                                                "servername": {
+                                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).ServerName",
+                                                    "type": "Expression"
+                                                },
+                                                "databasename": {
+                                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).DatabaseName",
+                                                    "type": "Expression"
+                                                },
+                                                "username": {
+                                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).UserName",
+                                                    "type": "Expression"
+                                                },
+                                                "password": {
+                                                    "value": "@json(pipeline().parameters.Entity.SrcConnectionParam).Password",
+                                                    "type": "Expression"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "referenceName": "DES_ADLS_Json",
+                                            "type": "DatasetReference",
+                                            "parameters": {
+                                                "ContainerName": {
+                                                    "value": "@pipeline().parameters.Entity.TgtRootContainer",
+                                                    "type": "Expression"
+                                                },
+                                                "FolderPath": {
+                                                    "value": "@concat(\n     toLower(pipeline().parameters.Entity.BusinessArea),'/'\n    ,toLower(pipeline().parameters.Entity.TgtFileName),'/'\n    ,variables('Runtime')[1],'/'\n    ,variables('Runtime')[2],'/'\n    ,variables('Runtime')[3],'/'\n    ,variables('Runtime')[4],'/'\n    ,variables('Runtime')[5],'/'\n    ,variables('Runtime')[6]\n)",
+                                                    "type": "Expression"
+                                                },
+                                                "FileName": {
+                                                    "value": "@{pipeline().parameters.Entity.TgtFileName}.parquet",
+                                                    "type": "Expression"
+                                                },
+                                                "AccountName": {
+                                                    "value": "@json(pipeline().parameters.Entity.TgtConnectionParam).AccountName",
+                                                    "type": "Expression"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Update LastRefreshStatus To InProgress",
+                        "type": "Script",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "NonQuery",
+                                    "text": {
+                                        "value": "UPDATE [config].[RDBMSControlTable]\nSET LastRefreshStatus='InProgress'\nWHERE ControlID = @{pipeline().parameters.Entity.ControlID}\n",
+                                        "type": "Expression"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "Entity": {
+                        "type": "object"
+                    }
+                },
+                "variables": {
+                    "CopyType": {
+                        "type": "String"
+                    },
+                    "Runtime": {
+                        "type": "Array"
+                    },
+                    "FilePath": {
+                        "type": "String"
+                    }
+                },
+                "folder": {
+                    "name": "Staging/RDBMS"
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-11-22T13:25:01Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/DS_BinaryFolder')]",
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDB_SRC')]",
+                "[concat(variables('factoryId'), '/datasets/DS_AzSQL')]",
+                "[concat(variables('factoryId'), '/datasets/DES_ADLS_Json')]",
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_Staging_RDBMS_Master')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "LKP_Create_BatchID",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": "select 1",
+                                "queryTimeout": "02:00:00",
+                                "partitionOption": "None"
+                            },
+                            "dataset": {
+                                "referenceName": "AzureSqlTable1",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    },
+                    {
+                        "name": "Set Filter Clause",
+                        "type": "SetVariable",
+                        "dependsOn": [
+                            {
+                                "activity": "LKP_Create_BatchID",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "variableName": "FilterClause",
+                            "value": {
+                                "value": "@{if(\n    equals(pipeline().parameters.FilterClause,'')\n    ,' WHERE IsActive=1'\n    ,if(contains(pipeline().parameters.FilterClause,'WHERE')\n    ,replace(toLower(pipeline().parameters.FilterClause),'where',' where isactive=1 and ')\n    ,concat(' WHERE IsActive=1 AND ',pipeline().parameters.FilterClause)\n))}",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Extract RDBMS Tables Details",
+                        "type": "Script",
+                        "dependsOn": [
+                            {
+                                "activity": "Set Filter Clause",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "Query",
+                                    "text": {
+                                        "value": "@{concat('UPDATE [Config].[RDBMSControlTable] SET LastRefreshStatus = NULL, RefreshStartDate= GETUTCDATE() ',variables('FilterClause'))\n}\n;SELECT * FROM [Config].[vw_RDBMSControlTable] @{variables('FilterClause')}",
+                                        "type": "Expression"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ForEach_ExtractDataFromOnPrem",
+                        "type": "ForEach",
+                        "dependsOn": [
+                            {
+                                "activity": "Extract RDBMS Tables Details",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Extract RDBMS Tables Details').output.resultSets[0].rows",
+                                "type": "Expression"
+                            },
+                            "batchCount": 8,
+                            "activities": [
+                                {
+                                    "name": "Switch on Src Connection Type",
+                                    "type": "Switch",
+                                    "dependsOn": [],
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "on": {
+                                            "value": "@toLower(item().SrcConnectionType)",
+                                            "type": "Expression"
+                                        },
+                                        "cases": [
+                                            {
+                                                "value": "sqldb",
+                                                "activities": [
+                                                    {
+                                                        "name": "PL_Logging_Staging",
+                                                        "type": "ExecutePipeline",
+                                                        "dependsOn": [
+                                                            {
+                                                                "activity": "Execute staging for RDBMS Onprem tables",
+                                                                "dependencyConditions": [
+                                                                    "Completed"
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "userProperties": [],
+                                                        "typeProperties": {
+                                                            "pipeline": {
+                                                                "referenceName": "PL_Logging",
+                                                                "type": "PipelineReference"
+                                                            },
+                                                            "waitOnCompletion": true,
+                                                            "parameters": {
+                                                                "BusinessArea": {
+                                                                    "value": "@pipeline().parameters.BusinessArea",
+                                                                    "type": "Expression"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "Execute staging for RDBMS Onprem tables",
+                                                        "type": "ExecutePipeline",
+                                                        "dependsOn": [],
+                                                        "userProperties": [],
+                                                        "typeProperties": {
+                                                            "pipeline": {
+                                                                "referenceName": "PL_Staging_RDBMS_Child_0",
+                                                                "type": "PipelineReference"
+                                                            },
+                                                            "waitOnCompletion": true,
+                                                            "parameters": {
+                                                                "Entity": {
+                                                                    "value": "@item()",
+                                                                    "type": "Expression"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "Fail Pipeline",
+                                                        "type": "Fail",
+                                                        "dependsOn": [
+                                                            {
+                                                                "activity": "Execute staging for RDBMS Onprem tables",
+                                                                "dependencyConditions": [
+                                                                    "Failed"
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "userProperties": [],
+                                                        "typeProperties": {
+                                                            "message": "Failed Due to Inner Activity Failure",
+                                                            "errorCode": "500"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "FilterClause": {
+                        "type": "string",
+                        "defaultValue": "IsActive=1 and controlid in (1,2)"
+                    },
+                    "run_type": {
+                        "type": "string",
+                        "defaultValue": "trigger"
+                    },
+                    "BusinessArea": {
+                        "type": "string",
+                        "defaultValue": "Test"
+                    }
+                },
+                "variables": {
+                    "FilterClause": {
+                        "type": "String"
+                    },
+                    "StartTime": {
+                        "type": "String"
+                    },
+                    "EndTime": {
+                        "type": "String"
+                    }
+                },
+                "folder": {
+                    "name": "Staging/RDBMS"
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-11-22T13:25:01Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]",
+                "[concat(variables('factoryId'), '/pipelines/PL_Logging')]",
+                "[concat(variables('factoryId'), '/pipelines/PL_Staging_RDBMS_Child_0')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_TriggerInfo')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Web1",
+                        "type": "WebActivity",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": {
+                                "value": "https://management.azure.com/subscriptions/7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad/resourceGroups/Rajesh_snpDemo1/providers/Microsoft.DataFactory/factories/internalrajeshadf/triggers?api-version=2018-06-01",
+                                "type": "Expression"
+                            },
+                            "method": "GET",
+                            "headers": {},
+                            "authentication": {
+                                "type": "MSI",
+                                "resource": "https://management.azure.com"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Stored procedure1",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "Web1",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[common].[usp_ADFPipelineTriggers]",
+                            "storedProcedureParameters": {
+                                "json_value": {
+                                    "value": {
+                                        "value": "@{string(activity('Web1').output)}\n\n",
+                                        "type": "Expression"
+                                    },
+                                    "type": "String"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-11-20T09:11:00Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pipeline1')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Set variable1",
+                        "type": "SetVariable",
+                        "dependsOn": [],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "variableName": "test",
+                            "value": [
+                                "anu"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "If Condition1",
+                        "type": "IfCondition",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "expression": {
+                                "value": "1=1",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "testcheckparam": {
+                        "type": "int"
+                    }
+                },
+                "variables": {
+                    "test": {
+                        "type": "Array"
+                    }
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-12-13T09:21:40Z"
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_Mart_Child')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Stored Procedure Execution",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": {
+                                "value": "@pipeline().parameters.P_StoredprocedureName",
+                                "type": "Expression"
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "P_BatchId": {
+                        "type": "string"
+                    },
+                    "P_MartName": {
+                        "type": "string"
+                    },
+                    "P_StoredprocedureName": {
+                        "type": "string"
+                    }
+                },
+                "folder": {
+                    "name": "EU/Mart"
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-12-13T10:17:22Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_Mart_Level_Refresh')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "LKP_GetAllTables_In_Current_Level",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT *\nFROM [Common].[EU_JobSequence]\nWHERE martName = '@{pipeline().parameters.P_Mart_Name}'\nand levelno = @{pipeline().parameters.P_Level_No}",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00",
+                                "partitionOption": "None"
+                            },
+                            "dataset": {
+                                "referenceName": "DS_Logging_AzSQL",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            },
+                            "firstRowOnly": false
+                        }
+                    },
+                    {
+                        "name": "ForEach_Wrap",
+                        "type": "ForEach",
+                        "dependsOn": [
+                            {
+                                "activity": "LKP_GetAllTables_In_Current_Level",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('LKP_GetAllTables_In_Current_Level').output.value",
+                                "type": "Expression"
+                            },
+                            "isSequential": false,
+                            "activities": [
+                                {
+                                    "name": "PL_Mart_Child",
+                                    "type": "ExecutePipeline",
+                                    "dependsOn": [],
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "pipeline": {
+                                            "referenceName": "PL_Mart_Child",
+                                            "type": "PipelineReference"
+                                        },
+                                        "waitOnCompletion": true,
+                                        "parameters": {
+                                            "P_BatchId": {
+                                                "value": "@pipeline().parameters.P_Batch_Id",
+                                                "type": "Expression"
+                                            },
+                                            "P_MartName": {
+                                                "value": "@pipeline().parameters.P_Mart_name",
+                                                "type": "Expression"
+                                            },
+                                            "P_StoredprocedureName": {
+                                                "value": "@item().StoredProcedure",
+                                                "type": "Expression"
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "Set variable on success",
+                                    "type": "SetVariable",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "PL_Mart_Child",
+                                            "dependencyConditions": [
+                                                "Succeeded"
+                                            ]
+                                        }
+                                    ],
+                                    "policy": {
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "variableName": "V_Dummy",
+                                        "value": "123"
+                                    }
+                                },
+                                {
+                                    "name": "PL_Logging",
+                                    "type": "ExecutePipeline",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "PL_Mart_Child",
+                                            "dependencyConditions": [
+                                                "Completed"
+                                            ]
+                                        }
+                                    ],
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "pipeline": {
+                                            "referenceName": "PL_Logging",
+                                            "type": "PipelineReference"
+                                        },
+                                        "waitOnCompletion": true,
+                                        "parameters": {
+                                            "P_RunId": {
+                                                "value": "@activity('PL_Mart_Child').output.pipelineRunId",
+                                                "type": "Expression"
+                                            },
+                                            "P_RunType": {
+                                                "value": "@pipeline().parameters.P_Run_Type",
+                                                "type": "Expression"
+                                            },
+                                            "P_CustomIdentifier": {
+                                                "value": "@item().StoredProcedure",
+                                                "type": "Expression"
+                                            },
+                                            "P_BatchId": {
+                                                "value": "@pipeline().parameters.P_Batch_Id",
+                                                "type": "Expression"
+                                            },
+                                            "P_PipelineName": "PL_Mart_Child"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "P_Batch_Id": {
+                        "type": "string"
+                    },
+                    "P_Level_No": {
+                        "type": "string"
+                    },
+                    "P_Mart_name": {
+                        "type": "string"
+                    },
+                    "P_Run_Type": {
+                        "type": "string"
+                    },
+                    "P_Load_Type": {
+                        "type": "string"
+                    }
+                },
+                "variables": {
+                    "V_Dummy": {
+                        "type": "String"
+                    }
+                },
+                "folder": {
+                    "name": "EU/Mart"
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-12-13T10:17:22Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/DS_Logging_AzSQL')]",
+                "[concat(variables('factoryId'), '/pipelines/PL_Mart_Child')]",
+                "[concat(variables('factoryId'), '/pipelines/PL_Logging')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PL_Master_DataMart_Refresh')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "LKP_Create_BatchID",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "DECLARE @current_datetime datetime = getdate()\nINSERT INTO [common].[EU_BatchDetails]  (CreatedDateTime,Comments)\nSELECT @current_datetime,'Mart Refresh Started- @{toUpper(pipeline().parameters.P_MartName)}'\n\nSELECT BatchID \nFROM [common].[EU_BatchDetails] \nwhere CreatedDateTime = @current_datetime",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00",
+                                "partitionOption": "None"
+                            },
+                            "dataset": {
+                                "referenceName": "DS_Logging_AzSQL",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    },
+                    {
+                        "name": "LKP_TotalLevels",
+                        "type": "Lookup",
+                        "dependsOn": [
+                            {
+                                "activity": "SP_SetJobsequence",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT MAX(levelno) as TotalLevels\nFROM [common].[EU_JobSequence]\nWHERE martName = '@{pipeline().parameters.P_MartName}'",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00",
+                                "partitionOption": "None"
+                            },
+                            "dataset": {
+                                "referenceName": "DS_Logging_AzSQL",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    },
+                    {
+                        "name": "SET_TotalLevels",
+                        "type": "SetVariable",
+                        "dependsOn": [
+                            {
+                                "activity": "LKP_TotalLevels",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "variableName": "V_Total_Levels",
+                            "value": {
+                                "value": "@string(activity('LKP_TotalLevels').output.firstRow.TotalLevels)",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Until_All_levels",
+                        "type": "Until",
+                        "dependsOn": [
+                            {
+                                "activity": "SET_TotalLevels",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "expression": {
+                                "value": "@greater(int(variables('V_Current_Level')),int(variables('V_Total_Levels')))",
+                                "type": "Expression"
+                            },
+                            "activities": [
+                                {
+                                    "name": "Set temp holder",
+                                    "type": "SetVariable",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "variableName": "V_Tmp_Level_Holder",
+                                        "value": {
+                                            "value": "@variables('V_Current_Level')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "PL_Mart_Level_Refresh",
+                                    "type": "ExecutePipeline",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "Set temp holder",
+                                            "dependencyConditions": [
+                                                "Succeeded"
+                                            ]
+                                        }
+                                    ],
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "pipeline": {
+                                            "referenceName": "PL_Mart_Level_Refresh",
+                                            "type": "PipelineReference"
+                                        },
+                                        "waitOnCompletion": true,
+                                        "parameters": {
+                                            "P_Batch_Id": {
+                                                "value": "@activity('LKP_Create_BatchID').output.firstRow.BatchID\n",
+                                                "type": "Expression"
+                                            },
+                                            "P_Level_No": {
+                                                "value": "@variables('V_Current_Level')",
+                                                "type": "Expression"
+                                            },
+                                            "P_Mart_name": {
+                                                "value": "@pipeline().parameters.P_MartName",
+                                                "type": "Expression"
+                                            },
+                                            "P_Run_Type": {
+                                                "value": "@pipeline().parameters.P_RunType",
+                                                "type": "Expression"
+                                            },
+                                            "P_Load_Type": {
+                                                "value": "@pipeline().parameters.P_LoadType",
+                                                "type": "Expression"
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "increment current level",
+                                    "type": "SetVariable",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "PL_Mart_Level_Refresh",
+                                            "dependencyConditions": [
+                                                "Succeeded"
+                                            ]
+                                        }
+                                    ],
+                                    "policy": {
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "variableName": "V_Current_Level",
+                                        "value": {
+                                            "value": "@string(add(int(variables('V_Tmp_Level_Holder')),1))",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "set Total_Levels plus 1",
+                                    "type": "SetVariable",
+                                    "dependsOn": [
+                                        {
+                                            "activity": "PL_Mart_Level_Refresh",
+                                            "dependencyConditions": [
+                                                "Failed"
+                                            ]
+                                        }
+                                    ],
+                                    "policy": {
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "variableName": "V_Current_Level",
+                                        "value": {
+                                            "value": "@string(add(int(variables('V_Total_Levels')),1))",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "timeout": "7.00:00:00"
+                        }
+                    },
+                    {
+                        "name": "SP_SetJobsequence",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "LKP_Create_BatchID",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[common].[USP_EU_JobSequence_INS]",
+                            "storedProcedureParameters": {
+                                "MartName": {
+                                    "value": {
+                                        "value": "@pipeline().parameters.P_MartName",
+                                        "type": "Expression"
+                                    },
+                                    "type": "String"
+                                },
+                                "where_cond": {
+                                    "value": {
+                                        "value": "@pipeline().parameters.P_WhereCondition",
+                                        "type": "Expression"
+                                    },
+                                    "type": "String"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "LKP Jobsequence",
+                        "type": "Lookup",
+                        "dependsOn": [
+                            {
+                                "activity": "Until_All_levels",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "Select ProcedureName,'@{pipeline().parameters.P_LoadType}' as LoadType from common.Eu_jobsequence",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00",
+                                "partitionOption": "None"
+                            },
+                            "dataset": {
+                                "referenceName": "DS_Logging_AzSQL",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            },
+                            "firstRowOnly": false
+                        }
+                    },
+                    {
+                        "name": "Exec USP_EU_Main_PopulateMart",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "LKP Jobsequence",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[common].[USP_EU_Main_PopulateMart]",
+                            "storedProcedureParameters": {
+                                "json_value": {
+                                    "value": {
+                                        "value": "@string(activity('LKP Jobsequence').output)",
+                                        "type": "Expression"
+                                    },
+                                    "type": "String"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "LS_AZ_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "parameters": {
+                    "P_MartName": {
+                        "type": "string",
+                        "defaultValue": "mart"
+                    },
+                    "P_RunType": {
+                        "type": "string",
+                        "defaultValue": "debug"
+                    },
+                    "P_WhereCondition": {
+                        "type": "string"
+                    },
+                    "P_LoadType": {
+                        "type": "string",
+                        "defaultValue": "ftl"
+                    }
+                },
+                "variables": {
+                    "V_Current_Level": {
+                        "type": "String",
+                        "defaultValue": "1"
+                    },
+                    "V_Total_Levels": {
+                        "type": "String"
+                    },
+                    "V_Tmp_Level_Holder": {
+                        "type": "String"
+                    }
+                },
+                "folder": {
+                    "name": "EU/Mart"
+                },
+                "annotations": [],
+                "lastPublishTime": "2023-12-13T10:17:23Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/DS_Logging_AzSQL')]",
+                "[concat(variables('factoryId'), '/linkedServices/LS_AZ_SQLDatabase')]",
+                "[concat(variables('factoryId'), '/pipelines/PL_Mart_Level_Refresh')]"
+            ]
+        }
+    ]
+}
