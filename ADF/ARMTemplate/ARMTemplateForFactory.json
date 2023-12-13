@@ -11,7 +11,8 @@
             "defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().servername};Initial Catalog=@{linkedService().databasename};User ID=@{linkedService().username};Password=@{linkedService().password}"
         },
         "AzureSqlMI1_connectionString": {
-            "type": "secureString"
+            "type": "secureString",
+            "defaultValue": "Integr"
         },
         "LS_AZ_SQLDatabase_connectionString": {
             "type": "secureString",
@@ -22,7 +23,8 @@
             "defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
         },
         "AzureDataLakeStorage1_accountKey": {
-            "type": "secureString"
+            "type": "secureString",
+             "defaultValue": "abc"
         },
         "trigger1_properties_PL_Staging_RDBMS_Master_parameters_FilterClause": {
             "type": "string",
