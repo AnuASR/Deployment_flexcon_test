@@ -27,7 +27,7 @@ jobs:
         az-version: latest
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         run: |
-          pwd
+          echo `pwd`
     
    
           
