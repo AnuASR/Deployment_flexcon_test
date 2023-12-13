@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "internalrajeshadf"
+        },
+        "LS_AZ_SQLDatabase_connectionString": {
+            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-dataprd.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20"
+        },
+        "LS_AzureSQL_EU_connectionString": {
+            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
+        },
+        "LS_OnPrem_SQL_EU_connectionString": {
+            "value": "Integrated Security=False;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName};User ID=@{linkedService().UserName}"
+        },
+        "LS_AZ_KeyVault_properties_typeProperties_baseUrl": {
+            "value": "https://flex-securevault-datadev.vault.azure.net/"
+        },
+        "ConnectOnPrem_properties_typeProperties_linkedInfo_resourceId": {
+            "value": "/subscriptions/fba4fc6c-1576-4a72-9370-d2fe887dd479/resourcegroups/flex-rg-dataprd/providers/Microsoft.DataFactory/factories/flex-datafactory-dataprd/integrationruntimes/IRConnectOnPremSources"
+        }
+    }
+}
