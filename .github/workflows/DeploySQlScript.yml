@@ -39,7 +39,7 @@ jobs:
           subscriptionId: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
           resourceGroupName: 'Rajesh_snpDemo1'
           template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
-          parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
+          parameters: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
           overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
       - name: Debug Log
         run: |
