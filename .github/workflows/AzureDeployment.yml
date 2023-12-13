@@ -41,6 +41,13 @@ jobs:
           connection-string: ${{ secrets.AZURE_SQL_CONNECTION }}
           path: 'TestScript.sql'
 
+      - name: Deploy ARM Template
+        uses: Azure/arm-deploy@v1
+        with:
+          # subscriptionId: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
+          resourceGroupName: 'Rajesh_snpDemo1'
+          template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
+          parameters: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
         
       - name: Display Azure Subscription Informations
         run: az account show
