@@ -38,7 +38,7 @@ jobs:
       - name: Deploy SQL script to Azure SQL
         uses: Azure/sql-action@v2
         with:
-          connection-string: 'Server=tcp:rajeshsnpdemo1.database.windows.net,1433;Initial Catalog=RajeshDemo1;Persist Security Info=False;User ID=rajeshsnpdemo1;Password=inScott@1122;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          connection-string: ${{ secrets.AZURE_SQL_CONNECTION }}
           path: 'TestScript.sql'
 
         
