@@ -8,9 +8,6 @@
         "AzureDataLakeStorage1_accountKey": {
             "value": ""
         },
-        "LS_AzureSQL_EU_connectionString": {
-            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
-        },
         "LS_AZ_SQLDatabase_connectionString": {
             "value": "Integrated Security=False;Encrypt=True;Connection Timeout=180;Data Source=flex-sqlserver-datadev.database.windows.net;Initial Catalog=flex-sqldb-datadev;User ID=sqladmin;ConnectRetryCount=6;ConnectRetryInterval=20"
         },
