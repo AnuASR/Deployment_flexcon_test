@@ -41,7 +41,11 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y azure-cli
     
-    
+    - name: Install Azure PowerShell Module
+      run: |
+        Install-Module -Name Az -AllowClobber -Force -Scope CurrentUser
+
+
     - name: Azure Login_cred
       uses: azure/login@v1
       with:
