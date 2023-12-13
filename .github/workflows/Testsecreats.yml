@@ -36,10 +36,6 @@ jobs:
       run: az login --service-principal -u 'af100c9a-7842-499f-b23b-6c5fad2c8c10' -p 'rcR8Q~F8BnjZJNuuGpb7Rizk0kgx5p3UgKp4.dtK' --tenant '30bf9f37-d550-4878-9494-1041656caf27'
     - name: Azure Login_secrets  
       run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-    - name: Set up Azure CLI
-      uses: azure/setup-az@v2
-      with:
-        az-version: latest
     
     - name: Azure Login_cred
       uses: azure/login@v1
