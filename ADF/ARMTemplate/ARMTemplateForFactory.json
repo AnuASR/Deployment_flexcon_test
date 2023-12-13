@@ -7,7 +7,7 @@
             "defaultValue": "internalrajeshadf"
         },
         "AzureDataLakeStorage1_accountKey": {
-            "type": "secureString",
+            "type": "secureString"
         },
         "LS_AzureSQL_EU_connectionString": {
             "type": "secureString",
