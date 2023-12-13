@@ -40,7 +40,7 @@ jobs:
           resourceGroupName: 'Rajesh_snpDemo1'
           template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
           parametersFile: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
-          # overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
+          overrideParameters: 'ADF/ARMTemplate/ARMTemplateOverrideParametersForFactory.json'
       - name: Debug Log
         run: |
           echo "ARM Template Contents:"
