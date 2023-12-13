@@ -41,18 +41,19 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y azure-cli
     
-    - name: Install Azure PowerShell Module
-      run: |
-        Install-Module -Name Az -AllowClobber -Force -Scope CurrentUser
+    # - name: Install Azure PowerShell Module
+    #   run: |
+    #     Install-Module -Name Az -AllowClobber -Force -Scope CurrentUser
 
 
     - name: Azure Login_cred
       uses: azure/login@v1
       with:
         az-version: latest
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
+        # client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        # tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        # subscription-id: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
         enable-AzPSSession: true
         
     - name: Display Azure Subscription Informations
