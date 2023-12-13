@@ -31,7 +31,7 @@ jobs:
     - name: Deploy SQL script to Azure SQL
       uses: Azure/sql-action@v2
       with:
-        connection-string: ${{ AZURE_SQL_CONNECTION }}
+        connection-string: ${{ secrets.AZURE_SQL_CONNECTION }}
         path: 'SQLDeployment/PostDepolymentsScript/TestScript.sql'
 
         
