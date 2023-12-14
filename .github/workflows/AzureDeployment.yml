@@ -29,12 +29,7 @@ jobs:
           az-version: latest
           creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-      - name: print pwd
-        run: |
-            echo `pwd`
-    
-   
-          
+
       - name: Deploy SQL script to Azure SQL
         uses: Azure/sql-action@v2
         with:
