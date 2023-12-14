@@ -39,7 +39,7 @@ jobs:
         uses: Azure/sql-action@v2
         with:
           connection-string: ${{ secrets.AZURE_SQL_CONNECTION }}
-          path: 'TestScript.sql'
+          path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
 
       - name: Deploy ARM Template
         uses: Azure/arm-deploy@v1
