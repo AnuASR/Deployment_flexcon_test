@@ -41,13 +41,13 @@ jobs:
 
           # A comma-separated list of secret names to be downloaded.
           # Use the default value `*` to download all the secrets from the vault.
-          secretsFilterString: adlstest
+          secretsFilterString: adlstest,AZURESQLCONNECTIONKV
           
         
       - name: Deploy SQL script to Azure SQL
         uses: Azure/sql-action@v2
         with:
-          connection-string: ${{ secrets.AZURE_SQL_CONNECTION }}
+          connection-string: ${{ secrets.AZURESQLCONNECTIONKV }}
           path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
 
       - name: Deploy ARM Template
