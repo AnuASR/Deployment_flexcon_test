@@ -32,13 +32,17 @@ jobs:
 
       - name: Azure Key Vault Action
         uses: gincher/azure-keyvault@v1
+        env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
+          
           # The name of the Azure Key Vault from which the secrets will be downloaded.
           keyVaultName: kvtestgitaction
 
           # A comma-separated list of secret names to be downloaded.
           # Use the default value `*` to download all the secrets from the vault.
           secretsFilterString: adlstest
+          
         
       - name: Deploy SQL script to Azure SQL
         uses: Azure/sql-action@v2
