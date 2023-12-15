@@ -47,7 +47,7 @@ jobs:
       - name: Deploy SQL script to Azure SQL
         uses: Azure/sql-action@v2
         with:
-          connection-string: ${{ secrets.AZURESQLCONNECTIONKV }}
+          connection-string: $AZURESQLCONNECTIONKV
           path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
 
       - name: Deploy ARM Template
