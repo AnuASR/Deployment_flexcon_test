@@ -27,14 +27,12 @@ jobs:
       - name: Azure Login_cred
         uses: azure/login@v1
         with:
-          az-version: latest
+          # az-version: latest
           creds: ${{ secrets.AZURE_CREDENTIALS }}
         
 
       - name: Azure Key Vault Action
-        uses: gincher/azure-keyvault@v1
-        env:
-            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        uses: Azure/get-keyvault-secrets@v1
         with:
           
           # The name of the Azure Key Vault from which the secrets will be downloaded.
