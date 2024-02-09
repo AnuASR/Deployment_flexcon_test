@@ -49,10 +49,15 @@ jobs:
         with:
           connection-string: ${{ steps.KeyVaultSecrets.outputs.AZURESQLCONNECTIONKV }}
           path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
-      - name: Deploy SQL script to Azure SQL
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: 'dev'
+      
+      - name: Deploy SQL script to Azure SQL2
         uses: Azure/sql-action@v2
         with:
-          ref: dev
           connection-string: ${{ steps.KeyVaultSecrets.outputs.AZURESQLCONNECTIONKV }}
           path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
 
