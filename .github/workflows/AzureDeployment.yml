@@ -44,19 +44,19 @@ jobs:
         id: KeyVaultSecrets
           
         
-      - name: Deploy SQL script to Azure SQL
-        uses: Azure/sql-action@v2
-        with:
-          connection-string: ${{ steps.KeyVaultSecrets.outputs.AZURESQLCONNECTIONKV }}
-          path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
+      # - name: Deploy SQL script to Azure SQL
+      #   uses: Azure/sql-action@v2
+      #   with:
+      #     connection-string: ${{ steps.KeyVaultSecrets.outputs.AZURESQLCONNECTIONKV }}
+      #     path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
 
-      - name: Deploy ARM Template
-        uses: Azure/arm-deploy@v1
-        with:
-          # subscriptionId: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
-          resourceGroupName: 'Rajesh_snpDemo1'
-          template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
-          parameters: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
+      # - name: Deploy ARM Template
+      #   uses: Azure/arm-deploy@v1
+      #   with:
+      #     # subscriptionId: '7cc0fc0e-c6d7-44f9-abf6-9d3deaad77ad'
+      #     resourceGroupName: 'Rajesh_snpDemo1'
+      #     template: 'ADF/ARMTemplate/ARMTemplateForFactory.json'
+      #     parameters: 'ADF/ARMTemplate/ARMTemplateParametersForFactory.json'
         
       - name: Display Azure Subscription Informations
         run: az account show
