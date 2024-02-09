@@ -44,11 +44,11 @@ jobs:
         id: KeyVaultSecrets
           
         
-      # - name: Deploy SQL script to Azure SQL
-      #   uses: Azure/sql-action@v2
-      #   with:
-      #     connection-string: ${{ steps.KeyVaultSecrets.outputs.AZURESQLCONNECTIONKV }}
-      #     path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
+      - name: Deploy SQL script to Azure SQL
+        uses: Azure/sql-action@v2
+        with:
+          connection-string: ${{ steps.KeyVaultSecrets.outputs.AZURESQLCONNECTIONKV }}
+          path: 'SQLDeployment/PostDepolymentsScript/EU_PostDeploymentScript.sql'
 
       # - name: Deploy ARM Template
       #   uses: Azure/arm-deploy@v1
